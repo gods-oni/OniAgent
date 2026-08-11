@@ -1,0 +1,17 @@
+{
+  "name": "oni-agent-one-task",
+  "displayName": "Oni Agent — One Task",
+  "version": "0.1.0",
+  "description": "One task at a time, remembered in .claude/TASK.md, so work survives losing the session. Resume with /oni-agent-continue.",
+  "author": {
+    "name": "gods-oni"
+  },
+  "license": "MIT",
+  "keywords": [
+    "task",
+    "memory",
+    "continuity",
+    "session",
+    "resume"
+  ]
+}

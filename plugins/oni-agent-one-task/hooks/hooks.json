@@ -1,0 +1,18 @@
+{
+  "description": "Keeps .claude/TASK.md within one turn of the repo while a task is open. Inert when no task file exists.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/task-guard.mjs"],
+            "timeout": 15,
+            "statusMessage": "Checking task memory"
+          }
+        ]
+      }
+    ]
+  }
+}

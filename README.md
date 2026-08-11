@@ -1,7 +1,23 @@
-# Oni Agent
+# gods-oni
 
-A Claude Code plugin that sets up, and then improves, the Claude Code configuration of other
-projects.
+A Claude Code plugin marketplace. Two plugins, installed independently.
+
+| Plugin | What it does |
+| --- | --- |
+| [`oni-agent`](plugins/oni-agent) | Sets up, and then improves, the Claude Code configuration of a project. |
+| [`oni-agent-one-task`](plugins/oni-agent-one-task) | One task at a time, remembered in `.claude/TASK.md`, so work survives losing the session. |
+
+```bash
+claude plugin marketplace add https://github.com/gods-oni/OniAgent
+claude plugin install oni-agent@gods-oni
+claude plugin install oni-agent-one-task@gods-oni
+```
+
+---
+
+# oni-agent
+
+Sets up, and then improves, the Claude Code configuration of other projects.
 
 Run `/oni-init-agent` inside any project. It interviews you about what you are building,
 proposes a stack, architecture pattern, MCP servers and memory strategy — each checked for
@@ -10,21 +26,8 @@ feasibility first — and then generates a `.claude/` setup tailored to the answ
 It writes **agent configuration only**: `CLAUDE.md`, `.claude/rules/`, skills, subagents,
 `.mcp.json`, settings. It does not scaffold application code or install dependencies.
 
-## Install
-
-```bash
-claude plugin marketplace add d:/InitialAgent
-claude plugin install oni-agent@gods-oni
-```
-
-Then, from any project:
-
-```
-/oni-init-agent
-```
-
-If the name collides with something else, the namespaced form
-`/oni-agent:oni-init-agent` always resolves.
+If the name collides with something else, the namespaced form `/oni-agent:oni-init-agent`
+always resolves.
 
 ## What it does
 
@@ -113,6 +116,67 @@ an instruction.
 
 Generated `CLAUDE.md` files carry an instruction pointing future sessions at it.
 
+---
+
+# oni-agent-one-task
+
+One task at a time, with a memory file written for a session that has no memory of this one.
+
+```
+/oni-agent-task <goal>     # open a task
+/oni-agent-continue        # resume it in a fresh session
+```
+
+The whole plugin is inert until a task is open, and every part of it exists only while the
+plugin is enabled.
+
+## `.claude/TASK.md`
+
+Gitignored — a working scratchpad, not something to put in a diff or a teammate's branch.
+
+```markdown
+# Task: <goal in one line>
+**Started:** … · **Updated:** …
+
+## Done means      acceptance criteria, agreed with the user when the task opened
+## Next            exactly one action, specific enough to start without deciding anything
+## Remaining       the rest, in order
+## Done            what was completed + the one fact worth carrying forward
+## Know this       constraints and decisions that are invisible in the repo
+## Ruled out       what was tried, and why it failed
+```
+
+The rule that keeps it short: **record only what cannot be recovered from the repo.** The diff
+shows what changed and `git log` shows what happened — restating either is how the file grows
+past the point where anyone reads it, and an unread task file is worse than none because it
+looks like state and is not. Target 60 lines.
+
+`Ruled out` is the section people skip and the one that pays. Without it a fresh session
+confidently retries the approach the last one disproved — and that failure is invisible from
+the inside, because the approach looks reasonable, which is exactly why it was tried first.
+
+## One task, enforced
+
+Opening a task while one is active shows you what is about to be destroyed — the goal, how much
+of `Done means` is checked, what `Next` said — and waits for a real answer. Describing new work
+is not the same as abandoning current work, and the file is gitignored, so there is no undo.
+
+## The Stop hook
+
+Instructions are context; a file that is only accurate at the end is exactly wrong, because the
+sessions that die are the ones that never reach the end. So the plugin ships a `Stop` hook
+([`hooks/task-guard.mjs`](plugins/oni-agent-one-task/hooks/task-guard.mjs)) that compares
+`TASK.md` against the working tree and blocks the turn from ending when code changed after the
+file was last written.
+
+It is inert with no task open, silent on a clean tree, and silent outside a git repo. Two
+independent loop guards: the block asks for the write that clears its own condition, and a
+per-turn marker keyed on `prompt_id` means a turn is blocked at most once even if the write
+never happens. Every unexpected error exits 0 — a backstop that breaks the session is worse
+than one that misses.
+
+Requires `node` on `PATH`.
+
 ## Design notes
 
 Three things this plugin takes a position on:
@@ -134,24 +198,27 @@ generated as skills, which is the real mechanism, rather than into a directory n
 ## Layout
 
 ```
-skills/
-├── oni-init-agent/
-│   ├── SKILL.md          # the orchestrator: 8 phases, hard rules
-│   ├── references/       # loaded on demand, per phase
-│   │   ├── feasibility.md
-│   │   ├── ecosystems.md
-│   │   ├── monorepo.md
-│   │   ├── existing-config.md
-│   │   ├── operability.md
-│   │   ├── architecture.md
-│   │   ├── mcp-catalog.md
-│   │   ├── memory.md
-│   │   └── blueprint.md
-│   └── templates/        # skeletons to fill, never to copy verbatim
-├── oni-agent-improve/
-│   └── SKILL.md          # audit an existing setup, non-breaking proposals
-└── remember-rule/
-    └── SKILL.md
+.claude-plugin/marketplace.json     # gods-oni — lists both plugins
+plugins/
+├── oni-agent/
+│   ├── .claude-plugin/plugin.json
+│   └── skills/
+│       ├── oni-init-agent/
+│       │   ├── SKILL.md            # the orchestrator: 8 phases, hard rules
+│       │   ├── references/         # loaded on demand, per phase
+│       │   └── templates/          # skeletons to fill, never to copy verbatim
+│       ├── oni-agent-improve/SKILL.md
+│       └── remember-rule/SKILL.md
+└── oni-agent-one-task/
+    ├── .claude-plugin/plugin.json
+    ├── hooks/
+    │   ├── hooks.json              # Stop
+    │   └── task-guard.mjs
+    └── skills/
+        ├── oni-agent-task/
+        │   ├── SKILL.md
+        │   └── references/task-file.md
+        └── oni-agent-continue/SKILL.md
 ```
 
 ## Extending it

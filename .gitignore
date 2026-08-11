@@ -7,3 +7,6 @@ CLAUDE.local.md
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Task memory (one task at a time, working scratchpad)
+.claude/TASK.md

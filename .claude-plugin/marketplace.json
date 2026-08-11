@@ -7,8 +7,13 @@
   "plugins": [
     {
       "name": "oni-agent",
-      "source": "./",
-      "description": "Interviews you about a project, then generates a tailored .claude/ setup for it."
+      "source": "./plugins/oni-agent",
+      "description": "Interviews you about a project, then generates a tailored .claude/ setup for it, and audits that setup over time."
+    },
+    {
+      "name": "oni-agent-one-task",
+      "source": "./plugins/oni-agent-one-task",
+      "description": "One task at a time, remembered in .claude/TASK.md, so work survives losing the session."
     }
   ]
 }
