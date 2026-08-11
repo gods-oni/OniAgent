@@ -1,0 +1,14 @@
+{
+  "name": "gods-oni",
+  "description": "Claude Code plugins by gods-oni.",
+  "owner": {
+    "name": "gods-oni"
+  },
+  "plugins": [
+    {
+      "name": "oni-agent",
+      "source": "./",
+      "description": "Interviews you about a project, then generates a tailored .claude/ setup for it."
+    }
+  ]
+}

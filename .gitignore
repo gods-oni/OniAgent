@@ -1,0 +1,9 @@
+# Personal, machine-local Claude Code config
+.claude/settings.local.json
+CLAUDE.local.md
+.worktreeinclude
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store

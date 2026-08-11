@@ -1,0 +1,19 @@
+{
+  "name": "oni-agent",
+  "displayName": "Oni Agent",
+  "version": "0.1.0",
+  "description": "Interviews you about a project and generates a tailored .claude/ setup for it, then audits and improves that setup over time.",
+  "author": {
+    "name": "gods-oni"
+  },
+  "license": "MIT",
+  "keywords": [
+    "scaffolding",
+    "onboarding",
+    "claude-md",
+    "rules",
+    "skills",
+    "mcp",
+    "memory"
+  ]
+}
