@@ -1,8 +1,8 @@
 {
   "name": "oni-agent",
   "displayName": "Oni Agent",
-  "version": "0.1.0",
-  "description": "Interviews you about a project and generates a tailored .claude/ setup for it, then audits and improves that setup over time.",
+  "version": "0.2.0",
+  "description": "Interviews you about a project, reads its architecture, conventions and commit history, then generates its CLAUDE.md, rules, settings and task commands — and scaffolds a standalone agent program when the job needs one.",
   "author": {
     "name": "gods-oni"
   },
@@ -14,6 +14,11 @@
     "rules",
     "skills",
     "mcp",
-    "memory"
+    "memory",
+    "task",
+    "graph-engineering",
+    "loop-engineering",
+    "routines",
+    "agent-sdk"
   ]
 }
